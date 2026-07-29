@@ -12,17 +12,19 @@ use grass::{from_path, from_string, Options, OutputStyle};
 pub enum Style {
     Expanded,
     Compressed,
+    GtkCompressed,
 }
 
 impl ValueEnum for Style {
     fn value_variants<'a>() -> &'a [Self] {
-        &[Self::Expanded, Self::Compressed]
+        &[Self::Expanded, Self::Compressed, Self::GtkCompressed]
     }
 
     fn to_possible_value(&self) -> Option<PossibleValue> {
         Some(match self {
             Self::Expanded => PossibleValue::new("expanded"),
             Self::Compressed => PossibleValue::new("compressed"),
+            Self::GtkCompressed => PossibleValue::new("gtk-compressed"),
         })
     }
 }
@@ -223,6 +225,7 @@ fn main() -> std::io::Result<()> {
     let style = match &matches.get_one::<Style>("STYLE").unwrap() {
         Style::Expanded => OutputStyle::Expanded,
         Style::Compressed => OutputStyle::Compressed,
+        Style::GtkCompressed => OutputStyle::GtkCompressed,
     };
 
     let options = &Options::default()

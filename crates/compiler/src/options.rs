@@ -61,11 +61,13 @@ impl<'a> Options<'a> {
         self
     }
 
-    /// `grass` currently offers 2 different output styles
+    /// `grass` currently offers 4 different output styles
     ///
     ///  - [`OutputStyle::Expanded`] writes each selector and declaration on its own line.
     ///  - [`OutputStyle::Compressed`] removes as many extra characters as possible
     ///    and writes the entire stylesheet on a single line.
+    ///  - [`OutputStyle::GtkCompressed`] mirrors [`OutputStyle::Compressed`]s style, while
+    ///    maintaining compatibility with GTK CSS.
     ///
     /// By default, output is expanded.
     #[must_use]
@@ -129,7 +131,9 @@ impl<'a> Options<'a> {
     /// By default, Sass will insert either a `@charset`
     /// declaration (in expanded output mode) or a byte-order
     /// mark (in compressed output mode) if the stylesheet
-    /// contains any non-ASCII characters.
+    /// contains any non-ASCII characters. In gtk-compressed mode
+    /// no charset is ever inserted, since gtk css already expects
+    /// all css to be utf-8.
     #[must_use]
     #[inline]
     pub const fn allows_charset(mut self, allows_charset: bool) -> Self {
@@ -178,7 +182,10 @@ impl<'a> Options<'a> {
     }
 
     pub(crate) fn is_compressed(&self) -> bool {
-        matches!(self.style, OutputStyle::Compressed)
+        matches!(
+            self.style,
+            OutputStyle::Compressed | OutputStyle::GtkCompressed
+        )
     }
 }
 
@@ -224,4 +231,7 @@ pub enum OutputStyle {
     /// Ideal for release builds, this mode removes as many extra characters as
     /// possible and writes the entire stylesheet on a single line.
     Compressed,
+
+    /// Like [`Self::Compressed`] but compatible with GTK CSS.
+    GtkCompressed,
 }

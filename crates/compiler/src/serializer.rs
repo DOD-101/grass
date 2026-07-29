@@ -16,7 +16,7 @@ use crate::{
         fuzzy_equals, ArgList, CalculationArg, CalculationName, SassCalculation, SassFunction,
         SassMap, SassNumber, Value,
     },
-    Options,
+    Options, OutputStyle,
 };
 
 pub(crate) fn serialize_selector_list(
@@ -646,9 +646,15 @@ impl<'a> Serializer<'a> {
         // SAFETY: todo
         let mut as_string = unsafe { String::from_utf8_unchecked(self.buffer) };
 
-        if is_not_ascii && self.options.is_compressed() && self.options.allows_charset {
+        if is_not_ascii
+            && self.options.style == OutputStyle::Compressed
+            && self.options.allows_charset
+        {
             as_string.insert(0, '\u{FEFF}');
-        } else if is_not_ascii && self.options.allows_charset {
+        } else if is_not_ascii
+            && self.options.allows_charset
+            && self.options.style != OutputStyle::GtkCompressed
+        {
             as_string.insert_str(0, "@charset \"UTF-8\";\n");
         }
 
@@ -1060,7 +1066,7 @@ impl<'a> Serializer<'a> {
             let did_write = self.visit_stmt(last)?;
 
             if did_write {
-                if needs_semicolon && !self.options.is_compressed() {
+                if needs_semicolon && self.options.style != OutputStyle::Compressed {
                     self.buffer.push(b';');
                 }
 
