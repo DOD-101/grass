@@ -61,7 +61,7 @@ impl<'a> Options<'a> {
         self
     }
 
-    /// `grass` currently offers 4 different output styles
+    /// `grass` currently offers 3 different output styles
     ///
     ///  - [`OutputStyle::Expanded`] writes each selector and declaration on its own line.
     ///  - [`OutputStyle::Compressed`] removes as many extra characters as possible
